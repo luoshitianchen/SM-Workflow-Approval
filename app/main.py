@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from app import base
 
 SERVICE = "sm-workflow-approval"
-VERSION = "2.0.0"
+VERSION = "3.0.0"
 NAME = "SM Workflow Approval"
 DESCRIPTION = "流程审批引擎：流程定义、审批请求、多级审批与驳回"
 PORT = 8350

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm-workflow-approval
+  namespace: sm
+  labels:
+    app: sm-workflow-approval
+    platform: sm-suite
+spec:
+  type: ClusterIP
+  selector:
+    app: sm-workflow-approval
+  ports:
+  - name: http
+    port: 8350
+    targetPort: http
+    protocol: TCP

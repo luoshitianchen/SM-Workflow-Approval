@@ -1,16 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "SM-Workflow-Approval"
-version = "2.0.0"
-description = "流程审批引擎：流程定义、审批请求、多级审批与驳回"
+name = "sm-service"
+version = "1.0.0"
 requires-python = ">=3.11"
 
 [tool.ruff]
-line-length = 200
+line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM"]
-ignore = ["E501"]
+select = ["E", "F", "I", "W", "UP", "B", "SIM"]
+# B008: FastAPI 的 Depends() 是框架文档推荐写法，属于误报
+ignore = ["E501", "B008"]
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "-v --tb=short"

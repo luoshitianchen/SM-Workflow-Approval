@@ -11,7 +11,7 @@ from app.core.config import settings
 from app.core.database import init_db
 from app.core.logging import setup_logging
 from app.core.middleware import SecurityMiddleware
-from app.routers import crypto, health, items, meta, metrics
+from app.routers import crypto, health, items, meta, metrics, wf_chains, wf_nodes, wf_workflows
 
 setup_logging()
 
@@ -42,7 +42,9 @@ app.include_router(meta.router)
 app.include_router(crypto.router)
 app.include_router(items.router)
 app.include_router(metrics.router)
-
+app.include_router(wf_workflows.router)
+app.include_router(wf_nodes.router)
+app.include_router(wf_chains.router)
 
 
 @app.get("/", include_in_schema=False)

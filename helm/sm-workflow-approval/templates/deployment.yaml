@@ -1,0 +1,82 @@
+# Deployment: sm-workflow-approval（滚动更新，非 root，只读根文件系统）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sm-workflow-approval.fullname" . }}
+  labels:
+    {{- include "sm-workflow-approval.commonLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "sm-workflow-approval.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sm-workflow-approval.selectorLabels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: {{ .Values.probes.metricsPath | quote }}
+        prometheus.io/port: {{ .Values.service.targetPort | quote }}
+    spec:
+      serviceAccountName: {{ include "sm-workflow-approval.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: {{ .Values.service.protocol }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "sm-workflow-approval.fullname" . }}-config
+            - secretRef:
+                name: {{ include "sm-workflow-approval.fullname" . }}-secrets
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.healthPath }}
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readyPath }}
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.healthPath }}
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      {{- if .Values.affinity.podAntiAffinityEnabled }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "sm-workflow-approval.selectorLabels" . | nindent 20 }}
+                topologyKey: kubernetes.io/hostname
+      {{- end }}

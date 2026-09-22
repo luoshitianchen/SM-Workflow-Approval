@@ -1,0 +1,29 @@
+{{- if .Values.autoscaling.enabled }}
+# HPA: CPU 70% / 内存 80% 触发扩缩，2~10 副本
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "sm-workflow-approval.fullname" . }}
+  labels:
+    {{- include "sm-workflow-approval.commonLabels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "sm-workflow-approval.fullname" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }}

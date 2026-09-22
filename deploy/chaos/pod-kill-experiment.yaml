@@ -1,0 +1,27 @@
+# Chaos Experiment: 随机终止 sm-workflow-approval Pod，验证可用性与自愈能力
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: sm-workflow-approval-pod-kill
+  labels:
+    app.kubernetes.io/name: sm-workflow-approval
+spec:
+  appinfo:
+    appns: sm-prod
+    applabel: app.kubernetes.io/name=sm-workflow-approval
+    appkind: deployment
+  chaosServiceAccount: litmus-admin
+  jobCleanUpPolicy: retain
+  experiments:
+    - name: pod-delete
+      spec:
+        components:
+          env:
+            - name: TARGET_PODS
+              value: "sm-workflow-approval"
+            - name: CHAOS_DURATION
+              value: "30"
+            - name: PODS_AFFECTED_PERC
+              value: "50"
+            - name: TOTAL_CHAOS_DURATION
+              value: "60"

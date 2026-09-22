@@ -1,0 +1,28 @@
+{{- if .Values.ingress.enabled }}
+# Ingress: 对外入口（TLS 重定向 + 请求体限制）
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "sm-workflow-approval.fullname" . }}
+  labels:
+    {{- include "sm-workflow-approval.commonLabels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ .Values.ingress.host }}-tls
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "sm-workflow-approval.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}

@@ -1,0 +1,24 @@
+# DEV 环境覆盖 values（通过 -f values-dev.yaml 合并）
+replicaCount: 1
+
+image:
+  tag: "2.1.0"
+
+config:
+  env: dev
+  logLevel: DEBUG
+  logFormat: console
+  databaseHost: "sm-workflow-approval-pg"
+  databaseName: "sm_workflow_approval"
+  allowedHosts: "sm-workflow-approval.dev.sm.example.com,localhost"
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 4
+
+ingress:
+  enabled: false
+  host: "sm-workflow-approval.dev.sm.example.com"
+
+# 数据库实例规格提示（dev）：小规格

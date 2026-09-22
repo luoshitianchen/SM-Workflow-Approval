@@ -1,0 +1,24 @@
+# STAGING 环境覆盖 values（通过 -f values-staging.yaml 合并）
+replicaCount: 1
+
+image:
+  tag: "2.1.0"
+
+config:
+  env: staging
+  logLevel: INFO
+  logFormat: json
+  databaseHost: "sm-workflow-approval-pg"
+  databaseName: "sm_workflow_approval"
+  allowedHosts: "sm-workflow-approval.staging.sm.example.com,localhost"
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 4
+
+ingress:
+  enabled: true
+  host: "sm-workflow-approval.staging.sm.example.com"
+
+# 数据库实例规格提示（staging）：中规格

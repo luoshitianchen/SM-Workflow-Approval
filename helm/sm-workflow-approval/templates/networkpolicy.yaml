@@ -1,0 +1,39 @@
+# NetworkPolicy: 入站仅同 namespace + API-Gateway；出站允许 DNS/数据库/同 namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "sm-workflow-approval.fullname" . }}
+  labels:
+    {{- include "sm-workflow-approval.commonLabels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "sm-workflow-approval.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.service.targetPort }}
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector: {}
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432

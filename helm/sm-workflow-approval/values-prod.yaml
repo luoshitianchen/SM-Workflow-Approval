@@ -1,0 +1,24 @@
+# PROD 环境覆盖 values（通过 -f values-prod.yaml 合并）
+replicaCount: 2
+
+image:
+  tag: "2.1.0"
+
+config:
+  env: prod
+  logLevel: INFO
+  logFormat: json
+  databaseHost: "sm-workflow-approval-pg"
+  databaseName: "sm_workflow_approval"
+  allowedHosts: "sm-workflow-approval.sm.example.com,localhost"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+
+ingress:
+  enabled: true
+  host: "sm-workflow-approval.sm.example.com"
+
+# 数据库实例规格提示（prod）：主库+只读副本

@@ -26,8 +26,8 @@
     {
       "type": "library",
       "name": "pydantic",
-      "version": "2.13.4",
-      "purl": "pkg:pypi/pydantic@2.13.4"
+      "version": "2.13.5",
+      "purl": "pkg:pypi/pydantic@2.13.5"
     },
     {
       "type": "library",
